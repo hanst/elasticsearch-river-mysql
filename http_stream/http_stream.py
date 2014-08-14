@@ -9,7 +9,7 @@ from pymysqlreplication.row_event import *
 
 mysql_settings = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': ''}
 
-def default(obj):
+def dateEncoder(obj):
     """Default JSON serializer."""
     import calendar, datetime
 
@@ -45,13 +45,13 @@ class Streamer(object):
                           "action": "update",
                           "type": binlogevent.table,
                           "id": row["after_values"]["id"],
-                          "doc": row["after_values"]}) + "\n"
+                          "doc": row["after_values"]},default=dateEncoder) + "\n"
                     elif isinstance(binlogevent, WriteRowsEvent):
                         yield json.dumps({
                           "action": "insert",
                           "type": binlogevent.table,
                           "id": row["values"]["id"],
-                          "doc": row["values"]},default=default) + "\n"
+                          "doc": row["values"]},default=dateEncoder) + "\n"
         return content()
 
     index.exposed = True
